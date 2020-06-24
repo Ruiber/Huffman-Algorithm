@@ -13,6 +13,9 @@ huff *pop(huff *heap[]);
 void down(huff *heap[], int pos);
 void populate(huff *heap[], int *freq);
 huff *huffman(huff *heap[]);
+void pre(huff *root, FILE *file);
+void sym(huff *root, FILE *file);
+void print_tree(huff *root);
 
 int main(){
     huff *root;
@@ -21,8 +24,8 @@ int main(){
     huff *heap[257];
     
     populate(heap, freq);
-
     root = huffman(heap);
+    print_tree(root);
 
     free(freq);
     
@@ -119,4 +122,28 @@ huff *huffman(huff *heap[]){
         insert(heap, root);
     }
     return root;
+}
+
+void pre(huff *root, FILE *file){
+    if(root != NULL){
+        fprintf(file, "%d %d ", root->ch, root->freq);
+        pre(root->left, file);
+        pre(root->right, file);
+    }
+}
+
+void sym(huff *root, FILE *file){
+    if(root != NULL){
+        pre(root->left, file);
+        fprintf(file, "%d %d ", root->ch, root->freq);
+        pre(root->right, file);
+    }
+}
+
+void print_tree(huff *root){
+    FILE *file = fopen("arvhuf.txt", "w");
+    pre(root, file);
+    fprintf(file, "\n");
+    sym(root, file);
+    fclose(file);
 }
