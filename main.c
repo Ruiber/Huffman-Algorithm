@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct huff_tree{
     int freq, ch;
@@ -16,16 +17,18 @@ huff *huffman(huff *heap[]);
 void pre(huff *root, FILE *file);
 void sym(huff *root, FILE *file);
 void print_tree(huff *root);
+void char_coder(huff *root, char code[], char *codes[]);
 
 int main(){
-    huff *root;
-    int *freq = freq_table("input.txt");
-    int i;
-    huff *heap[257];
+    huff *root, *heap[257];
+    char *codes[256], code[256];
+    int *freq = freq_table("input.txt"), i;
+    code[0] = '\0';
     
     populate(heap, freq);
     root = huffman(heap);
     print_tree(root);
+    char_coder(root, code, codes);
 
     free(freq);
     
@@ -146,4 +149,20 @@ void print_tree(huff *root){
     fprintf(file, "\n");
     sym(root, file);
     fclose(file);
+}
+
+void char_coder(huff *root, char code[], char *codes[]){
+    int size = strlen(code);
+    if(root->ch != -1){
+        codes[root->ch] = (char *)malloc(sizeof(char)*256);
+        strcpy(codes[root->ch], code);
+    }
+    else{
+        code[size + 1] = '\0';
+        code[size] = '0';
+        char_coder(root->left, code, codes);
+        code[size + 1] = '\0';
+        code[size] = '1';
+        char_coder(root->right, code, codes);
+    }
 }
