@@ -22,24 +22,35 @@ void encoder (char *fileName, char *codes[]);
 huff *build();
 void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre_init, int pre_fin, int sym_init, int sym_final, huff **root);
 void decoder(char *fileName, huff *root);
+void encode(char *fileName);
+void decode();
 
 int main(){
-    huff *root, *heap[257], *root2;
+    encode("input.txt");
+    decode();
+    
+    return 0;
+}
+
+void encode(char *fileName){
+    huff *root, *heap[257];
     char *codes[256], code[256];
-    int *freq = freq_table("input.txt"), i;
+    int *freq = freq_table(fileName);
     code[0] = '\0';
     
     populate(heap, freq);
     root = huffman(heap);
     print_tree(root);
     char_coder(root, code, codes);
-    encoder("input.txt", codes);
-    root2 = build();
-    decoder("texto.txt", root2);
-
+    encoder(fileName, codes);
     free(freq);
-    
-    return 0;
+}
+
+void decode(){
+    huff *root;
+
+    root = build();
+    decoder("texto.txt", root);
 }
 
 int *freq_table(char *fileName){
