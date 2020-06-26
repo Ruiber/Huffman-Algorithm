@@ -21,6 +21,7 @@ void char_coder(huff *root, char code[], char *codes[]);
 void encoder (char *fileName, char *codes[]);
 huff *build();
 void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre_init, int pre_fin, int sym_init, int sym_final, huff **root);
+void decoder(char *fileName, huff *root);
 
 int main(){
     huff *root, *heap[257], *root2;
@@ -34,6 +35,7 @@ int main(){
     char_coder(root, code, codes);
     encoder("input.txt", codes);
     root2 = build();
+    decoder("texto.txt", root2);
 
     free(freq);
     
@@ -227,5 +229,24 @@ void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre
         
         builder(pre_ch, pre_freq, sym_ch, sym_freq, pre_init + 1, pre_init + left_size, sym_init, pos_sym - 1, &((*root)->left));
         builder(pre_ch, pre_freq, sym_ch, sym_freq, pre_init + left_size + 1, pre_fin, pos_sym + 1, sym_fin, &((*root)->right));
+    }
+}
+
+void decoder(char *fileName, huff *root){
+    FILE *file = fopen(fileName, "r");
+    FILE *out = fopen("saida.txt", "w");
+    int ch;
+    char c;
+    huff *aux = root;
+    
+    while((c = fgetc(file)) != EOF){
+        if(c == '1') aux = aux->right;
+        else aux = aux->left;
+        if(aux->ch >= 0){
+            ch = aux->ch;
+            if(ch > 127) ch -= 256;
+            fputc((char) ch, out);
+            aux = root;
+        }
     }
 }
