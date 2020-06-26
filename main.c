@@ -18,9 +18,12 @@ void pre(huff *root, FILE *file);
 void sym(huff *root, FILE *file);
 void print_tree(huff *root);
 void char_coder(huff *root, char code[], char *codes[]);
+void encoder (char *fileName, char *codes[]);
+huff *build();
+void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre_init, int pre_fin, int sym_init, int sym_final, huff **root);
 
 int main(){
-    huff *root, *heap[257];
+    huff *root, *heap[257], *root2;
     char *codes[256], code[256];
     int *freq = freq_table("input.txt"), i;
     code[0] = '\0';
@@ -29,6 +32,8 @@ int main(){
     root = huffman(heap);
     print_tree(root);
     char_coder(root, code, codes);
+    encoder("input.txt", codes);
+    root2 = build();
 
     free(freq);
     
@@ -137,9 +142,9 @@ void pre(huff *root, FILE *file){
 
 void sym(huff *root, FILE *file){
     if(root != NULL){
-        pre(root->left, file);
+        sym(root->left, file);
         fprintf(file, "%d %d ", root->ch, root->freq);
-        pre(root->right, file);
+        sym(root->right, file);
     }
 }
 
@@ -164,5 +169,63 @@ void char_coder(huff *root, char code[], char *codes[]){
         code[size + 1] = '\0';
         code[size] = '1';
         char_coder(root->right, code, codes);
+    }
+}
+
+void encoder (char *fileName, char *codes[]){
+    FILE *file = fopen(fileName, "r");
+    FILE *encfile = fopen("texto.txt", "w");
+    char c;
+    
+    while((c = fgetc(file)) != EOF){
+        if((int) c >= 0) fprintf(encfile, codes[(int) c]);
+        else fprintf(encfile, codes[256 + (int) c]);
+    }
+}
+
+huff *build(){
+    FILE *hf = fopen("arvhuf.txt", "r");
+    huff *root = NULL;
+    int pre_ch[512], pre_freq[512], sym_ch[512], sym_freq[512], n = 0, aux;
+    
+    //Contagem
+    while(!feof (hf)){
+        fscanf(hf, "%d", &aux);
+        n++;
+    }
+    n /= 4;
+    rewind(hf);
+    
+    //Preenchendo os arrays
+    for(aux = 0; aux < n; aux++){
+        fscanf(hf, "%d %d", &pre_ch[aux], &pre_freq[aux]);
+    }
+    for(aux = 0; aux < n; aux++){
+        fscanf(hf, "%d %d", &sym_ch[aux], &sym_freq[aux]);
+    }
+
+    builder(pre_ch, pre_freq, sym_ch, sym_freq, 0, n-1, 0, n-1, &root);
+
+    return root;
+}
+
+void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre_init, int pre_fin, int sym_init, int sym_fin, huff **root){
+    int pos_sym, left_size, right_size;
+    if(pre_fin - pre_init < 0){
+        *root = NULL;
+    }
+    else{
+        *root = (huff *)malloc(sizeof(huff));
+        (*root)->ch = pre_ch[pre_init];
+        (*root)->freq = pre_freq[pre_init];
+        for(pos_sym = sym_init; pos_sym <= sym_fin; pos_sym++){
+            if((sym_freq[pos_sym] == (*root)->freq) && (sym_ch[pos_sym] == (*root)->ch)) break;
+        }
+        
+        left_size = pos_sym - sym_init;
+        right_size = sym_fin - pos_sym;
+        
+        builder(pre_ch, pre_freq, sym_ch, sym_freq, pre_init + 1, pre_init + left_size, sym_init, pos_sym - 1, &((*root)->left));
+        builder(pre_ch, pre_freq, sym_ch, sym_freq, pre_init + left_size + 1, pre_fin, pos_sym + 1, sym_fin, &((*root)->right));
     }
 }
