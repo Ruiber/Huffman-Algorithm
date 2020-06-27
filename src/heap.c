@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "..\include\heap.h"
+#include "../include/heap.h"
 
 void insert(huff *heap[], huff *node){
     heap[++heap[0]->freq] = node;

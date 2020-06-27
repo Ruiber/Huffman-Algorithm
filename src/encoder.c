@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "..\include\encoder.h"
-#include "..\include\heap.h"
+#include "../include/encoder.h"
+#include "../include/heap.h"
 
 int *freq_table(char *fileName){
     FILE *file = fopen(fileName, "r");
@@ -35,7 +35,7 @@ void sym(huff *root, FILE *file){
 }
 
 void print_tree(huff *root){
-    FILE *file = fopen("..\\I-O\\arvhuf.txt", "w");
+    FILE *file = fopen("../I-O/arvhuf.txt", "w");
     pre(root, file);
     fprintf(file, "\n");
     sym(root, file);
@@ -60,7 +60,7 @@ void char_coder(huff *root, char code[], char *codes[]){
 
 void encoder (char *fileName, char *codes[]){
     FILE *file = fopen(fileName, "r");
-    FILE *encfile = fopen("..\\I-O\\texto.txt", "w");
+    FILE *encfile = fopen("../I-O/texto.txt", "w");
     char c;
     
     while((c = fgetc(file)) != EOF){
