@@ -35,7 +35,7 @@ void sym(huff *root, FILE *file){
 }
 
 void print_tree(huff *root){
-    FILE *file = fopen("../I-O/arvhuf.txt", "w");
+    FILE *file = fopen("I-O/arvhuf.txt", "w");
     pre(root, file);
     fprintf(file, "\n");
     sym(root, file);
@@ -60,12 +60,12 @@ void char_coder(huff *root, char code[], char *codes[]){
 
 void encoder (char *fileName, char *codes[]){
     FILE *file = fopen(fileName, "r");
-    FILE *encfile = fopen("../I-O/texto.txt", "w");
+    FILE *encfile = fopen("I-O/texto.txt", "w");
     char c;
     
     while((c = fgetc(file)) != EOF){
-        if((int) c >= 0) fprintf(encfile, codes[(int) c]);
-        else fprintf(encfile, codes[256 + (int) c]);
+        if((int) c >= 0) fprintf(encfile, "%s", codes[(int) c]);
+        else fprintf(encfile, "%s", codes[256 + (int) c]);
     }
 }
 

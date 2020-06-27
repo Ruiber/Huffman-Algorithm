@@ -8,11 +8,11 @@ void decode(){
     huff *root;
 
     root = build();
-    decoder("../I-O/texto.txt", root);
+    decoder("I-O/texto.txt", root);
 }
 
 huff *build(){
-    FILE *hf = fopen("../I-O/arvhuf.txt", "r");
+    FILE *hf = fopen("I-O/arvhuf.txt", "r");
     huff *root = NULL;
     int pre_ch[512], pre_freq[512], sym_ch[512], sym_freq[512], n = 0, aux;
     
@@ -38,7 +38,7 @@ huff *build(){
 }
 
 void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre_init, int pre_fin, int sym_init, int sym_fin, huff **root){
-    int pos_sym, left_size, right_size;
+    int pos_sym, left_size;
     if(pre_fin - pre_init < 0){
         *root = NULL;
     }
@@ -51,7 +51,6 @@ void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre
         }
         
         left_size = pos_sym - sym_init;
-        right_size = sym_fin - pos_sym;
         
         builder(pre_ch, pre_freq, sym_ch, sym_freq, pre_init + 1, pre_init + left_size, sym_init, pos_sym - 1, &((*root)->left));
         builder(pre_ch, pre_freq, sym_ch, sym_freq, pre_init + left_size + 1, pre_fin, pos_sym + 1, sym_fin, &((*root)->right));
@@ -60,7 +59,7 @@ void builder(int pre_ch[], int pre_freq[], int sym_ch[], int sym_freq[], int pre
 
 void decoder(char *fileName, huff *root){
     FILE *file = fopen(fileName, "r");
-    FILE *out = fopen("../I-O/saida.txt", "w");
+    FILE *out = fopen("I-O/saida.txt", "w");
     int ch;
     char c;
     huff *aux = root;
